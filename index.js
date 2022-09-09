@@ -1,16 +1,26 @@
-console.log("A Node futtatja ezt a fájlt!")
+import express, { json, request, response } from "express";
+import { diakok } from "./adatok.js";
 
-const szam = Math.round(Math.random()*100)
+const app = express();
+app.use(express.json())
 
-console.log(`A véletlen szám: ${szam}`)
-if(szam>=50){
-    console.log("Gratulálok")
-}
-else{
-    console.log("Sajnálom")
-}
-szam>=50 ? console.log("Gratulálok") : console.log("Sajnálom!!")
+app.get('/', (request, response)=> {
+    //response.send('Saját szerverünk küldi ezt az üzenetet!')
+    response.send(diakok)
+})
 
+app.get('/:id', (request, response)=> {
+    const {id} = request.params
+    const filteredArr = diakok.filter(obj=>obj.id==id)
+    response.send(filteredArr)
+})
+app.post('/', (request, response)=>{
+    const {id,nev,osz} = request.body
+    diakok.push({id:id,nev:nev,osz:osz})
+    response.send(diakok)
+})
+app.get('*', (request, response)=>{
+    response.status(404).send('Az oldal nem létezik')
+})
 
-import { diakok } from "./adatok.js"
-console.log(`a diákok létszáma: ${diakok.length}`)
+app.listen(5000,()=> console.log("server listening on port 5000...."))
